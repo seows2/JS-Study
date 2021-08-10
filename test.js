@@ -83,3 +83,21 @@ console.log(Boolean("0")); // false
 var elem = null;
 
 console.log(elem?.value); // null
+
+var person = {
+  "first-name": "우석",
+  "last-name": "서",
+  gender: "남자",
+  1: 10,
+};
+
+console.log(person);
+
+console.log(person["first-name"]); // '우석'
+
+console.log(person.gender); // '남자'
+console.log(person[gender]); // ReferenceError: gender is not defined
+console.log(person["gender"]); // '남자'
+
+console.log(person["1"]); // 10
+console.log(person[1]); // 10 : person[1] -> person['1']
