@@ -1,2 +1,2 @@
-let value = true;
-console.log(typeof value);
+this.a = 1;
+console.log(this.__proto__);
