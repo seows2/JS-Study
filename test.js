@@ -1,2 +1,2 @@
-this.a = 1;
-console.log(this.__proto__);
+console.log(Number.EPSILON);
+console.log(0.1 + 0.2);
