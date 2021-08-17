@@ -1,2 +1,9 @@
-console.log(Number.EPSILON);
-console.log(0.1 + 0.2);
+const today = new Date();
+const dateString = today.toLocaleDateString("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+});
+const dayName = today.toLocaleDateString("en-US", { weekday: "long" });
+
+console.log(dateString, dayName);
