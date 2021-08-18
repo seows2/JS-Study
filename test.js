@@ -1,11 +1,4 @@
-const users = [
-  { id: 1, name: "Lee" },
-  { id: 2, name: "Kim" },
-  { id: 2, name: "Choi" },
-  { id: 3, name: "Park" },
-];
-
-// 콜백함수를 실행하여 그 결과가 참인 첫번째 요소를 반환한다.
-let result = users.findIndex((item) => item.id === 2); // { id: 2, name: 'Kim' }
-
-console.log(result);
+const points = [40, 100, 1, 5, 2, 25, 10];
+const sort1 = points.sort(); // [1, 10, 100, 2, 25, 40, 5]
+const sort2 = points.sort((a, b) => a - b); // [1, 2, 5, 10, 25, 40, 100]
+const sort3 = points.sort((a, b) => b - a); // [ 100, 40, 25, 10, 5, 2, 1 ]
