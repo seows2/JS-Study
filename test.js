@@ -1,13 +1,17 @@
-const arr = ["zero", "one", "two"];
+const arr1 = Array.from({ length: 3 }, (_, i) => i);
+const arr2 = Array.from({ length: 3 }, () => Array(3).fill(0));
+const arr3 = Array.from(arr1, (elm) => elm * 2);
+
+console.log(arr1); // [ 0, 1, 2 ]
+console.log(arr2); // [ [ 0, 0, 0 ], [ 0, 0, 0 ], [ 0, 0, 0 ] ]
+console.log(arr3); // [ 0, 2, 4 ]
+console.log(arr1);
 const obj1 = {
   0: "zero",
   1: "one",
   2: "two",
   length: 3,
 };
-console.log(arr[1]); // 'one'
-console.log(arr.length); // 3
-console.log(typeof arr); // object
-console.log(obj1[1]); // 'one'
-console.log(obj1.length); // 3
-console.log(typeof obj1); // object
+
+const arr4 = Array.from(obj1);
+console.log(arr4);
