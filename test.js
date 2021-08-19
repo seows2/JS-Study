@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 setTimeout(
   (name) => {
     let coffeeList = name;
@@ -33,3 +34,7 @@ setTimeout(
   500,
   "Espresso"
 );
+=======
+const arr2 = Array.from({ length: 3 });
+console.log(arr2);
+>>>>>>> 90c5d25456f9addd09883fa11f98d8aebda3c58a
