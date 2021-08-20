@@ -1,40 +1,17 @@
-<<<<<<< HEAD
-setTimeout(
-  (name) => {
-    let coffeeList = name;
-    console.log(coffeeList);
+const promise1 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 100, "one");
+});
 
-    setTimeout(
-      (name) => {
-        coffeeList += ", " + name;
-        console.log(coffeeList);
+const promise2 = new Promise((resolve, reject) => {
+  setTimeout(reject, 120, "two");
+});
 
-        setTimeout(
-          (name) => {
-            coffeeList += ", " + name;
-            console.log(coffeeList);
-
-            setTimeout(
-              (name) => {
-                coffeeList += ", " + name;
-                console.log(coffeeList);
-              },
-              500,
-              "Latte"
-            );
-          },
-          500,
-          "Mocha"
-        );
-      },
-      500,
-      "Americano"
-    );
+Promise.all([promise1, promise2]).then(
+  (value) => {
+    console.log(value);
+    // Both resolve, but promise2 is faster
   },
-  500,
-  "Espresso"
+  (e) => console.log("e", e)
 );
-=======
-const arr2 = Array.from({ length: 3 });
-console.log(arr2);
->>>>>>> 90c5d25456f9addd09883fa11f98d8aebda3c58a
+
+// expected output: "two"
