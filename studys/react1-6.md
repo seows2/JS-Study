@@ -102,6 +102,10 @@ setTimeout(() => {
 
 이렇게 특정 상태에 의존해 자동으로 반응하는 것을 **리액티브**하다고 표현합니다.
 
+리액트를 비롯한 모던 UI 라이브러리는 이러한 리액티브한 특징을 가지고 있다. MVC 모델에서는 컨트롤러가 데이터와 뷰를 직접 관리한다. 어플리케이션을 동작시킬 때 모델도 변경하고 뷰도 빠짐없이 챙겨야하는 것이다.
+
+한편 UI 상태를 나타내는 것을 뷰모델(View Model, 줄여서 VM)이라고 하는데 컨트롤러의 역할을 뷰모델이 일부 대체한다. 뷰모델을 변경하는 것만으로 UI를 자동으로 갱신하기 때문이다.
+
 <br>
 
 ## 가상돔
@@ -233,7 +237,7 @@ const element = <h1>{title}</h1>;
 
 > 컴포넌트를 통해 UI를 재사용 가능한 개별적인 여러 조각으로 나누고, 각 조각을 개별적으로 살펴볼 수 있습니다.
 
-엘리먼트가 리액트 앱을 구성하는 최소단위라면, **컴포넌트는 UI를 나타내는 엘리먼트와 어플리케이션 로직을 포함한 상위 개념**이다. 로직은 컴포넌트의 상태를 변경하면서 UI 엘리먼트를 제어한다. 우리가 하려는 것은 입력 값이라는 상태를 **기억**하려는 것이다. 컴포넌트가 적합하다.
+엘리먼트가 리액트 앱을 구성하는 최소단위라면, **컴포넌트는 UI를 나타내는 엘리먼트와 어플리케이션 로직을 포함한 상위 개념**이다. 로직은 컴포넌트의 상태를 변경하면서 UI 엘리먼트를 제어하는 것입니다.
 
 <br>
 
@@ -264,7 +268,7 @@ ReactDOM.render(element, document.getElementById("root")); // Hello, Seo 렌더�
 
 > 주의: 컴포넌트의 이름은 항상 대문자로 시작합니다.
 
-React는 소문자로 시작하는 컴포넌트를 DOM 태그로 처리합니다. 예를 들어 <div />는 HTML div 태그를 나타내지만, \<Welcome \/> 은 컴포넌트를 나타내며 범위 안에 Welcome이 있어야 합니다.
+React는 소문자로 시작하는 컴포넌트를 DOM 태그로 처리합니다. 예를 들어 \<div \/>는 HTML div 태그를 나타내지만, \<Welcome \/> 은 컴포넌트를 나타내며 범위 안에 Welcome이 있어야 합니다.
 
 <br>
 
@@ -295,9 +299,18 @@ function withdraw(account, amount) {
 
 ![Lifecycle](../images/ls.png)
 
-## `constructor()`
+## **마운트**
 
-메서드를 바인딩하거나 state를 초기화하는 작업이 없다면, 해당 React 컴포넌트에는 생성자를 구현하지 않아도 됩니다.
+먼저 마운트될 때 발생하는 생명주기들을 알아봅시다.
+
+- `constructor`
+- `getDerivedStateFromProps`
+- `render`
+- `componentDidMount`
+
+<br>
+
+## `constructor()`
 
 React 컴포넌트의 생성자는 해당 컴포넌트가 마운트되기 전에 호출됩니다. React.Component를 상속한 컴포넌트의 생성자를 구현할 때에는 다른 구문에 앞서 super(props)를 호출해야 합니다. 그렇지 않으면 this.props가 생성자 내에서 정의되지 않아 버그로 이어질 수 있습니다.
 
@@ -306,12 +319,9 @@ React에서 생성자는 보통 아래의 두 가지 목적을 위하여 사용�
 - this.state에 객체를 할당하여 지역 state를 초기화
 - 인스턴스에 이벤트 처리 메서드를 바인딩
 
-constructor() 내부에서 setState()를 호출하면 안 됩니다. 컴포넌트에 지역 state가 필요하다면 생성자 내에서 this.state에 초기 state 값을 할당하면 됩니다.
-
 ```js
 constructor(props) {
   super(props);
-  // 여기서 this.setState()를 호출하면 안 됩니다!
   this.state = { counter: 0 };
   this.handleClick = this.handleClick.bind(this);
 }
@@ -319,19 +329,83 @@ constructor(props) {
 
 <br>
 
+## `getDerivedStateFromProps(props, state)`
+
+getDerivedStateFromProps 는 props 로 받아온 것을 state 에 넣어주고 싶을 때 사용합니다.
+
+```js
+static getDerivedStateFromProps(props, state) {
+    if (props.color !== state.color) {
+      return { color: props.color };
+    }
+    return null;
+  }
+```
+
+다른 생명주기 메서드와는 달리 앞에 static 을 필요로 하고, 이 안에서는 this를 조회 할 수 없습니다. 여기서 특정 객체를 반환하게 되면 해당 객체 안에 있는 내용들이 컴포넌트의 state 로 설정이 됩니다. 반면 null 을 반환하게 되면 아무 일도 발생하지 않습니다.
+
+<br>
+
 ## `componentDidMount()`
 
-`componentDidMount()`는 컴포넌트가 마운트된 직후, 즉 트리에 삽입된 직후에 호출됩니다. DOM 노드가 있어야 하는 초기화 작업은 이 메서드에서 이루어지면 됩니다. 외부에서 데이터를 불러와야 한다면, 네트워크 요청을 보내기 적절한 위치입니다.
+`componentDidMount()`는 컴포넌트가 마운트된 직후 호출됩니다. DOM 노드가 있어야 하는 초기화 작업은 이 메서드에서 이루어지면 됩니다.
 
-`componentDidMount()`에서 즉시 setState()를 호출하는 경우도 있습니다. 이로 인하여 추가적인 렌더링이 발생하지만, 브라우저가 화면을 갱신하기 전에 이루어질 것입니다. 이 경우 render()가 두 번 호출되지만, 사용자는 그 중간 과정을 볼 수 없을 것입니다. 이런 사용 방식은 성능 문제로 이어지기 쉬우므로 주의가 필요합니다. 대부분의 경우, 앞의 방식을 대신하여 constructor() 메서드에서 초기 state를 할당할 수 있습니다. 하지만 모달(Modal) 또는 툴팁과 같이 렌더링에 앞서 DOM 노드의 크기나 위치를 먼저 측정해야 하는 경우 이러한 방식이 필요할 수 있습니다.
+DOM 을 사용해야하는 외부 라이브러리 연동을 하거나, 해당 컴포넌트에서 필요로하는 데이터를 요청하기 위해 axios, fetch 등을 통하여 ajax 요청을 하거나, DOM 의 속성을 읽거나 직접 변경하는 작업을 진행합니다.
+
+<br>
+
+## 업데이트
+
+- getDerivedStateFromProps
+- shouldComponentUpdate
+- render
+- getSnapshotBeforeUpdate
+- componentDidUpdate
+
+## `shouldComponentUpdate(nextProps, nextState)`
+
+`shouldComponentUpdate()`는 props 또는 state가 새로운 값으로 갱신되어서 렌더링이 발생하기 직전에 호출됩니다. 기본값은 true입니다. 이 메서드는 초기 렌더링 또는 forceUpdate()가 사용될 때에는 호출되지 않습니다.
+
+이 메서드는 오직 **성능 최적화**만을 위한 것입니다.
+
+this.props와 nextProps, 그리고 this.state와 nextState를 비교한 뒤 false를 반환하는 것으로 React가 갱신 작업을 건너뛰게 만들 수 있습니다.
+
+  <br>
+  
+## shouldComponentUpdate In Action
+  
+각 항목에 대해 SCU는 shouldComponentUpdate가 반환한 것을 나타내며, vDOMEq는 React 엘리먼트가 동일한지 여부를 표시합니다. 마지막으로 원의 색은 컴포넌트를 조정해야 하는지 여부를 나타냅니다.
+  
+  ![SCU](../images/should-component-update.png)
+  
+  shouldComponentUpdate는 C2에 뿌리를 둔 하위트리에서 false를 반환했기 때문에 React는 C2를 렌더링하려고 시도하지 않았으므로 C4 및 C5에서 shouldComponentUpdate를 호출할 필요가 없었습니다.
+  
+  C1과 C3의 경우 shouldComponentUpdate가 true를 반환했으므로 React가 트리의 가장 하위에 가서 확인해야 했습니다. C6의 경우 shouldComponentUpdate는 true를 반환했고 렌더링 된 엘리먼트는 동일하지 않기 때문에 React는 DOM을 업데이트해야 했습니다.
+  
+  C8입니다. React는 이 컴포넌트를 렌더링 해야 했지만 이전에 렌더링 된 React 엘리먼트와 동일했기 때문에 DOM을 업데이트할 필요가 없었습니다.
+  
+<br>
+
+## `getSnapshotBeforeUpdate`
+
+`getSnapshotBeforeUpdate` 는 컴포넌트에 변화가 일어나기 직전의 DOM 상태를 가져와서 특정 값을 반환하면 그 다음 발생하게 되는 componentDidUpdate 함수에서 받아와서 사용을 할 수 있습니다.
+
+```js
+getSnapshotBeforeUpdate(prevProps, prevState) {
+  if (prevProps.color !== this.props.color) {
+    return this.myRef.style.color;
+  }
+  return null;
+}
+```
 
 <br>
 
 ## `componentDidUpdate(prevProps, prevState, snapshot)`
 
-`componentDidUpdate()`는 갱신이 일어난 직후에 호출됩니다. 이 메서드는 최초 렌더링에서는 호출되지 않습니다.
+`componentDidUpdate` 는 리렌더링이 마치고, 화면에 우리가 원하는 변화가 모두 반영되고 난 뒤 호출되는 메서드입니다. 3번째 파라미터로 `getSnapshotBeforeUpdate` 에서 반환한 값을 조회 할 수 있습니다.
 
-컴포넌트가 갱신되었을 때 DOM을 조작하기 위하여 이 메서드를 활용하면 좋습니다. 또한, 이전과 현재의 props를 비교하여 네트워크 요청을 보내는 작업도 이 메서드에서 이루어지면 됩니다 (가령, props가 변하지 않았다면 네트워크 요청을 보낼 필요가 없습니다).
+컴포넌트가 갱신되었을 때 DOM을 조작하기 위하여 이 메서드를 활용하면 좋습니다.
 
 ```js
 componentDidUpdate(prevProps) {
@@ -341,10 +415,6 @@ componentDidUpdate(prevProps) {
   }
 }
 ```
-
-componentDidUpdate()에서 setState()를 즉시 호출할 수도 있지만, 위의 예시처럼 조건문으로 감싸지 않으면 무한 반복이 발생할 수 있다는 점에 주의하세요. 또한 추가적인 렌더링을 유발하여, 비록 사용자는 눈치채지 못할지라도 컴포넌트 성능에 영향을 미칠 수 있습니다. 상위에서 내려온 prop을 그대로 state에 저장하는 것은 좋지 않으며, 그 대신 prop을 직접 사용하는 것이 좋습니다. 이와 관련된 자세한 정보는 props를 state에 복사하는 것이 버그를 유발하는 이유에서 확인할 수 있습니다.
-
-컴포넌트에서 getSnapshotBeforeUpdate()를 구현한다면, 해당 메서드가 반환하는 값은 componentDidUpdate()에 세 번째 “snapshot” 인자로 넘겨집니다. 반환값이 없다면 해당 인자는 undefined를 가집니다.
 
 > `componentDidUpdate()`는 `shouldComponentUpdate()`가 false를 반환하면 호출되지 않습니다.
 
@@ -358,27 +428,19 @@ componentDidUpdate()에서 setState()를 즉시 호출할 수도 있지만, 위�
 
 <br>
 
-## `shouldComponentUpdate(nextProps, nextState)`
+## **언마운트**
 
-`shouldComponentUpdate()`는 props 또는 state가 새로운 값으로 갱신되어서 렌더링이 발생하기 직전에 호출됩니다. 기본값은 true입니다. 이 메서드는 초기 렌더링 또는 forceUpdate()가 사용될 때에는 호출되지 않습니다.
-
-이 메서드는 오직 **성능 최적화**만을 위한 것입니다.
-
-이 메서드를 직접 작성할 자신이 있다면, this.props와 nextProps, 그리고 this.state와 nextState를 비교한 뒤 false를 반환하는 것으로 React가 갱신 작업을 건너뛰게 만들 수 있습니다.
+언마운트라는것은, 컴포넌트가 화면에서 사라지는것을 의미합니다. 언마운트에 관련된 생명주기 메서드는 `componentWillUnmount` 하나입니다.
 
 <br>
 
-## shouldComponentUpdate In Action
+## `componentWillUnmount`
 
-각 항목에 대해 SCU는 shouldComponentUpdate가 반환한 것을 나타내며, vDOMEq는 React 엘리먼트가 동일한지 여부를 표시합니다. 마지막으로 원의 색은 컴포넌트를 조정해야 하는지 여부를 나타냅니다.
+componentWillUnmount 는 컴포넌트가 화면에서 사라지기 직전에 호출됩니다.
 
-![SCU](../images/should-component-update.png)
+여기서는 주로 DOM에 직접 등록했었던 이벤트를 제거하고, 만약에 setTimeout 을 걸은것이 있다면 clearTimeout 을 통하여 제거를 합니다. 추가적으로, 외부 라이브러리를 사용한게 있고 해당 라이브러리에 dispose 기능이 있다면 여기서 호출해주시면 됩니다.
 
-shouldComponentUpdate는 C2에 뿌리를 둔 하위트리에서 false를 반환했기 때문에 React는 C2를 렌더링하려고 시도하지 않았으므로 C4 및 C5에서 shouldComponentUpdate를 호출할 필요가 없었습니다.
-
-C1과 C3의 경우 shouldComponentUpdate가 true를 반환했으므로 React가 트리의 가장 하위에 가서 확인해야 했습니다. C6의 경우 shouldComponentUpdate는 true를 반환했고 렌더링 된 엘리먼트는 동일하지 않기 때문에 React는 DOM을 업데이트해야 했습니다.
-
-C8입니다. React는 이 컴포넌트를 렌더링 해야 했지만 이전에 렌더링 된 React 엘리먼트와 동일했기 때문에 DOM을 업데이트할 필요가 없었습니다.
+<br>
 
 ## `setState(updater, [callback])`
 
@@ -403,3 +465,82 @@ React 엘리먼트에서 이벤트를 처리하는 방식은 DOM 엘리먼트에
 
 - React의 이벤트는 소문자 대신 캐멀 케이스(camelCase)를 사용합니다.
 - JSX를 사용하여 문자열이 아닌 함수로 이벤트 핸들러를 전달합니다.
+
+```js
+function Form() {
+  function handleSubmit(e) {
+    e.preventDefault();
+    console.log("You clicked submit.");
+  }
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <button type="submit">Submit</button>
+    </form>
+  );
+}
+```
+
+여기서 e는 합성 이벤트입니다. React는 W3C 명세에 따라 합성 이벤트를 정의하기 때문에 브라우저 호환성에 대해 걱정할 필요가 없습니다. React 이벤트는 브라우저 고유 이벤트와 정확히 동일하게 동작하지는 않습니다.
+
+React를 사용할 때 DOM 엘리먼트가 생성된 후 리스너를 추가하기 위해 addEventListener를 호출할 필요가 없습니다. 대신, 엘리먼트가 처음 렌더링될 때 리스너를 제공하면 됩니다.
+
+![이벤트_위임](../images/eventDelegation.png)
+
+> In React 16 and earlier, React would do document.addEventListener() for most events. React 17 will call rootNode.addEventListener() under the hood instead.
+
+```js
+class Toggle extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { isToggleOn: true };
+
+    // 콜백에서 `this`가 작동하려면 아래와 같이 바인딩 해주어야 합니다.
+    this.handleClick = this.handleClick.bind(this);
+  }
+
+  handleClick() {
+    this.setState((prevState) => ({
+      isToggleOn: !prevState.isToggleOn,
+    }));
+  }
+
+  render() {
+    return (
+      <button onClick={this.handleClick}>
+        {this.state.isToggleOn ? "ON" : "OFF"}
+      </button>
+    );
+  }
+}
+```
+
+```js
+class LoggingButton extends Component {
+  // 이 문법은 `this`가 handleClick 내에서 바인딩되도록 합니다.
+  // 주의: 이 문법은 *실험적인* 문법입니다.
+  // 클래스 프로퍼티
+  handleClick = () => {
+    console.log("this is:", this);
+  };
+
+  render() {
+    return <button onClick={this.handleClick}>Click me</button>;
+  }
+}
+```
+
+```js
+class LoggingButton extends Component {
+  handleClick() {
+    console.log("this is:", this);
+  }
+
+  render() {
+    // 이 문법은 `this`가 handleClick 내에서 바인딩되도록 합니다.
+    return <button onClick={() => this.handleClick()}>Click me</button>;
+  }
+}
+```
+
+이 문법의 문제점은 LoggingButton이 렌더링될 때마다 다른 콜백이 생성된다는 것입니다. 즉, 추가로 다시 렌더링을 수행할 수도 있습니다. 이러한 종류의 성능 문제를 피하고자, 생성자 안에서 바인딩하거나 클래스 필드 문법을 사용하는 것을 권장합니다.
