@@ -420,14 +420,6 @@ componentDidUpdate(prevProps) {
 
 <br>
 
-## `componentWillUnmount()`
-
-`componentWillUnmount()`는 컴포넌트가 마운트 해제되어 제거되기 직전에 호출됩니다. 이 메서드 내에서 타이머 제거, 네트워크 요청 취소, componentDidMount() 내에서 생성된 구독 해제 등 필요한 모든 정리 작업을 수행하세요.
-
-이제 컴포넌트는 다시 렌더링되지 않으므로, `componentWillUnmount()` 내에서 setState()를 호출하면 안 됩니다. 컴포넌트 인스턴스가 마운트 해제되고 나면, 절대로 다시 마운트되지 않습니다.
-
-<br>
-
 ## **언마운트**
 
 언마운트라는것은, 컴포넌트가 화면에서 사라지는것을 의미합니다. 언마운트에 관련된 생명주기 메서드는 `componentWillUnmount` 하나입니다.
