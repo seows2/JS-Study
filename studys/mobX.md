@@ -135,34 +135,43 @@ reaction: state가 변경될 때 자동으로 발생해야 하는 부수효과
 객체를 observable로 만드는 가장 기본적인 방법은 makeObservable를 사용하여 속성마다 주석을 지정하는 것
 
 ```js
-import { makeObservable, observable, computed, action, flow } from "mobx";
+import React from "react";
+import ReactDOM from "react-dom";
+import { makeAutoObservable } from "mobx";
+import { observer } from "mobx-react";
 
-class Doubler {
-  value;
+// 애플리케이션 상태를 모델링합니다.
+class Timer {
+  secondsPassed = 0;
 
-  constructor(value) {
-    makeObservable(this, {
-      value: observable,
-      double: computed,
-      increment: action,
-      fetch: flow,
-    });
-    this.value = value;
+  constructor() {
+    makeAutoObservable(this);
   }
 
-  get double() {
-    return this.value * 2;
+  increase() {
+    this.secondsPassed += 1;
   }
 
-  increment() {
-    this.value++;
-  }
-
-  *fetch() {
-    const response = yield fetch("/api/value");
-    this.value = response.json();
+  reset() {
+    this.secondsPassed = 0;
   }
 }
+
+const myTimer = new Timer();
+
+// observable state를 사용하는 사용자 인터페이스를 구축합니다.
+const TimerView = observer(({ timer }) => (
+  <button onClick={() => timer.reset()}>
+    Seconds passed: {timer.secondsPassed}
+  </button>
+));
+
+ReactDOM.render(<TimerView timer={myTimer} />, document.body);
+
+// 매초마다 Seconds passed: X를 업데이트 합니다.
+setInterval(() => {
+  myTimer.increase();
+}, 1000);
 ```
 
 **makeAutoObservable** ??
